@@ -5,7 +5,7 @@
 import random
 from os import mkdir
 import numpy as np
-from problin_libs.sim_lib import get_balanced_tree
+from phylostate_libs.sim_lib import get_balanced_tree
 from phylostate_libs.PhyloStateModel import PhyloStateModel
 
 p_list = [0.1,0.3,0.5]
