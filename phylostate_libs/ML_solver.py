@@ -54,4 +54,5 @@ class ML_solver:
             if abs(new_llh-curr_llh) < eps_conv:
                 break 
             curr_llh = new_llh
+        print("niter",i)
         return curr_llh

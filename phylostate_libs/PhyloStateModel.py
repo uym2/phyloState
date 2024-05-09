@@ -70,9 +70,12 @@ class PhyloStateModel:
             if node.is_root():
                 node.out_llh = np.log(self.root_distr)
             else:
-                v,w = node.parent.children
-                sis_node = w if (node is v) else v
-                llh_edge = log_sum_exp_matrix(self.P_trans.P_matrix,sis_node.in_llh)
+                if len(node.parent.children)==1:
+                    llh_edge = self.P_trans.P_matrix
+                else:    
+                    v,w = node.parent.children
+                    sis_node = w if (node is v) else v
+                    llh_edge = log_sum_exp_matrix(self.P_trans.P_matrix,sis_node.in_llh)
                 llh = llh_edge + node.parent.out_llh
                 node.out_llh = log_sum_exp_matrix(self.P_trans.P_matrix.T,llh)         
 
