@@ -71,8 +71,8 @@ class PhyloStateModel:
                 node.out_llh = np.log(self.root_distr)
             else:
                 if len(node.parent.children)==1:
-                    llh_edge = self.P_trans.P_matrix
-                else:    
+                    llh_edge = np.zeros_like(node.parent.out_llh)
+                else:   
                     v,w = node.parent.children
                     sis_node = w if (node is v) else v
                     llh_edge = log_sum_exp_matrix(self.P_trans.P_matrix,sis_node.in_llh)
