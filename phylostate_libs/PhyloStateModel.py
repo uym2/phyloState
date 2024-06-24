@@ -62,8 +62,8 @@ class PhyloStateModel:
                 node.in_llh_edge = log_sum_exp_matrix(self.P_trans.P_matrix,node.in_llh)             
         self.tree.llh = scipy.special.logsumexp(self.tree.root.in_llh,b=self.root_distr)
         return self.tree.llh    
-
-    def compute_out_llh(self,leaf2state):
+    
+    def compute_out_llh_og(self,leaf2state):
     # assume compute_in_llh has been called on the input tree
     # so every node u in the tree has the attribute u.in_llh
         for node in self.tree.traverse_preorder():
@@ -78,6 +78,31 @@ class PhyloStateModel:
                     llh_edge = log_sum_exp_matrix(self.P_trans.P_matrix,sis_node.in_llh)
                 llh = llh_edge + node.parent.out_llh
                 node.out_llh = log_sum_exp_matrix(self.P_trans.P_matrix.T,llh)         
+        return self.tree.root.out_llh
+
+    def compute_out_llh(self,leaf2state):
+    # assume compute_in_llh has been called on the input tree
+    # so every node u in the tree has the attribute u.in_llh
+        for node in self.tree.traverse_preorder():
+            if node.is_root():
+                node.out_llh = np.log(self.root_distr)
+            else:
+                if len(node.parent.children)==1:
+                    llh_edge = np.zeros_like(node.parent.out_llh)
+                else:   
+                    # modify to handle polytomies
+                    totalsibling_llh_edge = 0
+                    for cnode in node.parent.children:
+                        #v,w = node.parent.children
+                        #sis_node = w if (node is v) else v
+                        if cnode is not node:
+                            sis_node = cnode
+                            sibling_llh_edge = log_sum_exp_matrix(self.P_trans.P_matrix,sis_node.in_llh)
+                            totalsibling_llh_edge += sibling_llh_edge
+                    llh_edge = totalsibling_llh_edge
+                llh = llh_edge + node.parent.out_llh
+                node.out_llh = log_sum_exp_matrix(self.P_trans.P_matrix.T,llh)         
+        return self.tree.root.out_llh
 
     def compute_posterior(self,leaf2state):
         # assume that both compute_in_llh and compute_out_llh has been called
